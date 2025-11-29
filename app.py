@@ -58,7 +58,7 @@ st.markdown("""
 # HEADER
 # ----------------------------------------------------------
 st.markdown("<div class='big-title'>Visual Pattern Classifier</div>", unsafe_allow_html=True)
-st.markdown("<div class='sub-text'>A minimal and elegant web application for classifying 2D feature patterns using KNN and SVM.</div>", unsafe_allow_html=True)
+st.markdown("<div class='sub-text'>Visual pattern classifying 2D feature patterns using KNN and SVM.</div>", unsafe_allow_html=True)
 st.markdown("<hr>", unsafe_allow_html=True)
 
 # ----------------------------------------------------------
@@ -197,3 +197,4 @@ mis_svm = sum(svm.predict(X_test_scaled) != y_test)
 
 st.write(f"KNN Misclassified Samples: **{mis_knn}**")
 st.write(f"SVM Misclassified Samples: **{mis_svm}**")
+
