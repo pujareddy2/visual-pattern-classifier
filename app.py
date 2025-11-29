@@ -58,7 +58,7 @@ st.markdown("""
 # HEADER
 # ----------------------------------------------------------
 st.markdown("<div class='big-title'>Visual Pattern Classifier</div>", unsafe_allow_html=True)
-st.markdown("<div class='sub-text'>Visual pattern classifying 2D feature patterns using KNN and SVM.</div>", unsafe_allow_html=True)
+st.markdown("<div class='sub-text'>A minimal and elegant web application for classifying 2D feature patterns using KNN and SVM.</div>", unsafe_allow_html=True)
 st.markdown("<hr>", unsafe_allow_html=True)
 
 # ----------------------------------------------------------
@@ -173,28 +173,12 @@ with col2:
         plot_decision_boundary(svm, X_train_scaled, y_train, "SVM Decision Boundary")
 
 # ----------------------------------------------------------
-# COMPARISON CHART (BAR GRAPH)
-# ----------------------------------------------------------
-st.markdown("<h3>Accuracy Comparison Chart</h3>", unsafe_allow_html=True)
-
-fig, ax = plt.subplots(figsize=(5,4))
-models = ["KNN", "SVM"]
-accuracies = [acc_knn, acc_svm]
-
-ax.bar(models, accuracies, color=["#4B7BEC", "#26de81"])
-ax.set_ylim(0, 1.1)
-ax.set_ylabel("Accuracy")
-ax.set_title("KNN vs SVM Accuracy Comparison")
-
-st.pyplot(fig)
-
-# ----------------------------------------------------------
-# MISCLASSIFIED COUNT
+# MISCLASSIFIED
 # ----------------------------------------------------------
 st.markdown("<h3>Misclassified Samples</h3>", unsafe_allow_html=True)
+
 mis_knn = sum(knn.predict(X_test_scaled) != y_test)
 mis_svm = sum(svm.predict(X_test_scaled) != y_test)
 
 st.write(f"KNN Misclassified Samples: **{mis_knn}**")
 st.write(f"SVM Misclassified Samples: **{mis_svm}**")
-
