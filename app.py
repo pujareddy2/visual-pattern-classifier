@@ -9,54 +9,83 @@ from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 
 # ----------------------------------------------------------
-# PAGE CONFIG
+# STREAMLIT PAGE SETTINGS
 # ----------------------------------------------------------
 st.set_page_config(
     page_title="Visual Pattern Classifier",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
 # ----------------------------------------------------------
-# HEADER
+# GLOBAL CSS (NO MORE COLOR OVERRIDES)
 # ----------------------------------------------------------
-st.markdown(
-    """
-    <h1 style='text-align:center; color:#222;'>Visual Pattern Classifier</h1>
-    <p style='text-align:center; font-size:17px; color:#555;'>
-        A minimal and professional web application for classifying 2D feature patterns using KNN and SVM.
-    </p>
-    <hr>
-    """,
-    unsafe_allow_html=True
-)
+st.markdown("""
+    <style>
+
+    /* Heading stays readable in light + dark mode because no color is forced */
+    .big-title {
+        font-size: 42px;
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: -5px;
+    }
+
+    .sub-text {
+        text-align: center;
+        font-size: 17px;
+        margin-bottom: 25px;
+        opacity: 0.85;
+    }
+
+    /* Button styling */
+    .how-btn {
+        background: #4B7BEC;
+        color: white !important;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-size: 16px;
+        text-decoration: none;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+    }
+    .how-btn:hover {
+        background: #3a63c9;
+        transition: 0.2s ease-in-out;
+    }
+
+    /* Card style */
+    .card {
+        padding: 20px;
+        border-radius: 10px;
+        border: 1px solid rgba(150,150,150,0.15);
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(4px);
+    }
+
+    </style>
+""", unsafe_allow_html=True)
 
 # ----------------------------------------------------------
-# HOW IT WORKS BUTTON – Notion Redirect
+# HEADER SECTION (NO MANUAL COLOR → FIXED)
+# ----------------------------------------------------------
+st.markdown("<div class='big-title'>Visual Pattern Classifier</div>", unsafe_allow_html=True)
+st.markdown("<div class='sub-text'>Visual pattern classifying 2D feature patterns using KNN and SVM.</div>", unsafe_allow_html=True)
+st.markdown("<hr>", unsafe_allow_html=True)
+
+# ----------------------------------------------------------
+# HOW IT WORKS BUTTON
 # ----------------------------------------------------------
 colA, colB, colC = st.columns([1,2,1])
-
 with colB:
-    st.markdown(
-        """
+    st.markdown("""
         <div style="text-align:center; margin-top: -10px;">
-            <a href="https://www.notion.so/visualpatternclassification/Visual-Pattern-Classification-2ba6df4e0f008099a8a4d3087b085cf0?source=copy_link" 
-               target="_blank" 
-               style="
-                    text-decoration:none; 
-                    padding:12px 28px; 
-                    background:#4B7BEC; 
-                    color:white; 
-                    border-radius:6px; 
-                    font-size:16px;
-                    font-weight:500;
-                    letter-spacing:0.3px;
-                ">
-                How It Works
+            <a class="how-btn" target="_blank"
+               href="https://www.notion.so/visualpatternclassification/Visual-Pattern-Classification-2ba6df4e0f008099a8a4d3087b085cf0?source=copy_link">
+               How It Works
             </a>
         </div>
-        """,
-        unsafe_allow_html=True
-    )
+    """, unsafe_allow_html=True)
 
 # ----------------------------------------------------------
 # SIDEBAR INPUTS
@@ -79,12 +108,10 @@ X, y = make_classification(
     random_state=42
 )
 
-# TRAIN/TEST SPLIT
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=42
 )
 
-# NORMALIZATION
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
@@ -99,36 +126,40 @@ svm = SVC(kernel='rbf', C=1.0, gamma='scale')
 svm.fit(X_train_scaled, y_train)
 
 # ----------------------------------------------------------
-# PREDICTION + ACCURACY
+# LAYOUT: LEFT = Prediction / RIGHT = Graph
 # ----------------------------------------------------------
 col1, col2 = st.columns([1,2])
 
 with col1:
-    st.subheader("Prediction")
+    st.markdown("<h3>Prediction</h3>", unsafe_allow_html=True)
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
 
     if predict_btn:
-        user_input = np.array([[shape, texture]])
-        user_input_scaled = scaler.transform(user_input)
+        inp = np.array([[shape, texture]])
+        scaled_inp = scaler.transform(inp)
 
         if model_choice == "KNN":
-            pred = knn.predict(user_input_scaled)[0]
+            pred = knn.predict(scaled_inp)[0]
             st.success(f"Predicted Class (KNN): {pred}")
         else:
-            pred = svm.predict(user_input_scaled)[0]
+            pred = svm.predict(scaled_inp)[0]
             st.success(f"Predicted Class (SVM): {pred}")
     else:
         st.info("Enter values and click Predict")
 
-    # Accuracy
-    st.subheader("Model Accuracy")
-    acc_knn = accuracy_score(y_test, knn.predict(X_test_scaled))
-    acc_svm = accuracy_score(y_test, svm.predict(X_test_scaled))
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    st.write(f"KNN Accuracy: **{acc_knn:.2f}**")
-    st.write(f"SVM Accuracy: **{acc_svm:.2f}**")
+    # Accuracy
+    st.markdown("<h3 style='margin-top:25px;'>Model Accuracy</h3>", unsafe_allow_html=True)
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+
+    st.write(f"KNN Accuracy: **{accuracy_score(y_test, knn.predict(X_test_scaled)):.2f}**")
+    st.write(f"SVM Accuracy: **{accuracy_score(y_test, svm.predict(X_test_scaled)):.2f}**")
+
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # ----------------------------------------------------------
-# DECISION BOUNDARY PLOT
+# DECISION BOUNDARY
 # ----------------------------------------------------------
 def plot_decision_boundary(clf, X, y, title):
     x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
@@ -142,14 +173,15 @@ def plot_decision_boundary(clf, X, y, title):
     Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
     Z = Z.reshape(xx.shape)
 
-    plt.figure(figsize=(7, 6))
-    plt.contourf(xx, yy, Z, alpha=0.3, cmap="coolwarm")
-    plt.scatter(X[:, 0], X[:, 1], c=y, edgecolor="k", cmap="coolwarm", s=40)
-    plt.title(title)
-    st.pyplot(plt)
+    fig, ax = plt.subplots(figsize=(7,6))
+    ax.contourf(xx, yy, Z, alpha=0.3, cmap="coolwarm")
+    ax.scatter(X[:, 0], X[:, 1], c=y, edgecolor="k", cmap="coolwarm", s=40)
+    ax.set_title(title)
+
+    st.pyplot(fig)
 
 with col2:
-    st.subheader(f"{model_choice} Decision Boundary")
+    st.markdown(f"<h3>{model_choice} Decision Boundary</h3>", unsafe_allow_html=True)
 
     if model_choice == "KNN":
         plot_decision_boundary(knn, X_train_scaled, y_train, "KNN Decision Boundary")
@@ -157,9 +189,9 @@ with col2:
         plot_decision_boundary(svm, X_train_scaled, y_train, "SVM Decision Boundary")
 
 # ----------------------------------------------------------
-# MISCLASSIFIED SAMPLES
+# MISCLASSIFIED
 # ----------------------------------------------------------
-st.subheader("Misclassified Samples")
+st.markdown("<h3>Misclassified Samples</h3>", unsafe_allow_html=True)
 
 mis_knn = sum(knn.predict(X_test_scaled) != y_test)
 mis_svm = sum(svm.predict(X_test_scaled) != y_test)
